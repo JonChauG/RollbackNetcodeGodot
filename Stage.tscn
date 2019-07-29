@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://InputControl.gd" type="Script" id=1]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Floor.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Wall.tscn" type="PackedScene" id=4]
+
+[node name="Spatial" type="Spatial"]
+
+[node name="InputControl" type="Node" parent="."]
+script = ExtResource( 1 )
+
+[node name="LocalPlayer" parent="." instance=ExtResource( 2 )]
+transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, -5.64025, 3.0815, 8.21054 )
+
+[node name="Floor" parent="." instance=ExtResource( 3 )]
+
+[node name="Wall" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 0.814068, -0.580769, 0, 0.580769, 0.814068, -5.44056, 1.46145, 0 )
+
+[node name="Wall2" parent="." instance=ExtResource( 4 )]
+transform = Transform( -0.0257203, 0, 0.999669, 0, 1, 0, -0.999669, 0, -0.0257203, -2.82828, 4.01744, -4.92139 )
+
+[node name="Wall3" parent="." instance=ExtResource( 4 )]
+transform = Transform( 0.609503, 0, -0.792783, 0, 1, 0, 0.792783, 0, 0.609503, 2.09571, 1.47884, 3.97785 )
