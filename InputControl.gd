@@ -72,10 +72,10 @@ func thr_network_inputs(userdata = null):
 		input_received = true
 
 
-static func input_sort(a:Inputs, b:Inputs) -> bool:
-	if a.target_frame < b.target_frame:
-		return true
-	return false
+#static func input_sort(a:Inputs, b:Inputs) -> bool:
+#	if a.target_frame < b.target_frame:
+#		return true
+#	return false
 
 
 func _ready():
