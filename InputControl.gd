@@ -20,6 +20,7 @@ var input_received #boolean to detect if new inputs have been received, set to t
 var input_thread
 var testframe = 0
 
+var UDPPeer = PacketPeerUDP.new()
 
 #class declarations
 class Inputs:
@@ -51,32 +52,44 @@ class Frame_State:
 
 func thr_network_inputs(userdata = null):
 	#get inputs from network
-	var t = Timer.new()
-	t.name = "timer"
-	t.set_wait_time(0.2)
-	self.add_child(t) ##### WEE WOO
-	t.start()
-	
+
+	#OLD TEST THREAD
+#	var t = Timer.new()
+#	t.name = "timer"
+#	t.set_wait_time(0.2)
+#	self.add_child(t) ##### WEE WOO
+#	t.start()
+#
+#	while(true):
+#		yield(t, "timeout")
+#		#print("Timer Yield: testing Thread has released Inputs")
+#		input_array_mutex.lock()
+#		if testframe % 12 == 0:
+#			#####if input is within rollback and input_arrival_array[testframe] is currently set to false SET LATER IN ACTUAL NETWORKING THREAD
+#			input_array[testframe].net_input =  {'W': true, 'A': true, 'S': true, 'D': true, 'SPACE': true}
+#			input_arrival_array[testframe] = true
+#		else:
+#			input_array[testframe].net_input =  {'W': true, 'A': false, 'S': false, 'D': false, 'SPACE': false}
+#			input_arrival_array[testframe] = true
+#		input_array_mutex.unlock()
+#		testframe = (testframe + 1)%256
+#		input_received = true
+
+	#NEW TEST THREAD WITH NETWORKING
 	while(true):
-		yield(t, "timeout")
-		#print("Timer Yield: testing Thread has released Inputs")
-		input_array_mutex.lock()
-		if testframe % 12 == 0:
-			#####if input is within rollback and input_arrival_array[testframe] is currently set to false SET LATER IN ACTUAL NETWORKING THREAD
-			input_array[testframe].net_input =  {'W': true, 'A': true, 'S': true, 'D': true, 'SPACE': true}
-			input_arrival_array[testframe] = true
-		else:
-			input_array[testframe].net_input =  {'W': true, 'A': false, 'S': false, 'D': false, 'SPACE': false}
-			input_arrival_array[testframe] = true
-		input_array_mutex.unlock()
-		testframe = (testframe + 1)%256
-		input_received = true
-
-
-#static func input_sort(a:Inputs, b:Inputs) -> bool:
-#	if a.target_frame < b.target_frame:
-#		return true
-#	return false
+		UDPPeer.wait()
+		var result = true
+		while (result):
+			result = UDPPeer.get_packet()
+			if result.size() == 6:
+				input_array_mutex.lock()
+				input_array[result[0]].net_input = {'W': result[1], 'A': result[2], 'S': result[3], 'D': result[4], 'SPACE': result[5]}
+				input_arrival_array[result[0]] = true
+				input_array_mutex.unlock()
+				input_received = true
+			else:
+				print("RESULT SIZE IS TOO SMALL")
+			
 
 
 func _ready():
@@ -101,8 +114,11 @@ func _ready():
 		input_arrival_array[-i] = true #pretend all "previous" inputs arrived for initialization
 	
 	#create separate thread to receive inputs from network (testing)
+	
+	UDPPeer.listen(240, "::1")
+	UDPPeer.set_dest_address("::1", 240) #240 is experimental port
 	input_thread = Thread.new()
-	input_thread.start(self, "thr_network_inputs", null, 2)
+	input_thread.start(self, "thr_network_inputs", null, 2) #2: high priority
 	input_received = true
 
 
@@ -183,6 +199,7 @@ func handle_input():
 		local_input['SPACE'] = true
 #		#print("local_input['SPACE']" + str(local_input['SPACE']))
 	input_array[frame_num].local_input = local_input
+	UDPPeer.put_packet(PoolByteArray([frame_num, local_input['W'], local_input['A'], local_input['S'], local_input['D'], local_input['SPACE']]))
 	
 	
 #	input_array[frame_num].net_input =  {'W': true, 'A': true, 'S': true, 'D': true, 'SPACE': true}

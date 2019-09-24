@@ -10,29 +10,29 @@
 [node name="Spatial" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( -4.37114e-008, 0.173648, -0.984808, 0, 0.984808, 0.173648, 1, 7.5904e-009, -4.30473e-008, -20, 10, 0 )
+transform = Transform( 1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 10, 20 )
 
 [node name="InputControl" type="Node" parent="."]
 script = ExtResource( 1 )
 mute = true
 
 [node name="LocalPlayer" parent="InputControl" instance=ExtResource( 2 )]
-transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, -5.4431, 3.0815, 7.08053 )
+transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, 0, 3, 7 )
 collision_mask = 32769
 script = ExtResource( 3 )
 mute = true
 
 [node name="NetPlayer" parent="InputControl" instance=ExtResource( 2 )]
-transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, 4.86296, 3.0815, -4.81485 )
+transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, 0, 3, -7 )
 script = ExtResource( 4 )
 
 [node name="Floor" parent="." instance=ExtResource( 5 )]
 
 [node name="Wall" parent="." instance=ExtResource( 6 )]
-transform = Transform( 1, 0, 0, 0, 0.814068, -0.580769, 0, 0.580769, 0.814068, -5.44056, 1.46145, 0 )
+transform = Transform( 1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, -5, 1.5, 4 )
 
 [node name="Wall2" parent="." instance=ExtResource( 6 )]
-transform = Transform( -0.0257203, 0, 0.999669, 0, 1, 0, -0.999669, 0, -0.0257203, -2.82828, 4.01744, -4.92139 )
+transform = Transform( -0.0257203, 0, 0.999669, 0, 1, 0, -0.999669, 0, -0.0257203, 0, 3, 0 )
 
 [node name="Wall3" parent="." instance=ExtResource( 6 )]
-transform = Transform( 0.609503, 0, -0.792783, 0, 1, 0, 0.792783, 0, 0.609503, 2.09571, 1.47884, 3.97785 )
+transform = Transform( 0.999999, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 5, 1.5, -4 )
