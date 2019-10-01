@@ -90,9 +90,8 @@ func execute():
 	#print("pre-execute, updateCounter: " + str(updateCounter))
 	#execute calculated state of object for current frame
 	set_translation(Vector3(updateX, updateY, updateZ))
-	counter = updateCounter
 	#print("post-execute, position: " + str(get_translation()))
-	print("post-execute, counter: " + str(counter))
+	#print("post-execute, counter: " + str(counter))
 	#test_move
 	
 	
