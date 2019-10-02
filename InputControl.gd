@@ -121,7 +121,7 @@ func _ready():
 	input_received = false #network thread will set to true when a networked player is found.
 	
 	UDPPeer.listen(240, "*")
-	UDPPeer.set_dest_address("192.168.0.101", 240)
+	UDPPeer.set_dest_address("::1", 240)
 	input_thread = Thread.new()
 	input_thread.start(self, "thr_network_inputs", null, 2) #2: high priority
 	
