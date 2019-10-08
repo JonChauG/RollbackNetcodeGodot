@@ -18,7 +18,7 @@ var game_state = {} #holds dictionaries that track children states every frame
 var input_received #boolean to detect if new inputs have been received, set to true by networking thread, set to false by main when waiting on input
 var input_received_mutex = Mutex.new()
 
-var input_thread
+var input_thread = null
 
 var UDPPeer = PacketPeerUDP.new()
 
@@ -26,10 +26,12 @@ var UDPPeer = PacketPeerUDP.new()
 class Inputs:
 	var local_input #inputs by local player for a single frame
 	var net_input #inputs by a player over network for a single frame
+	var encoded_local_input
 	
 	func _init():
 		self.local_input = {'W': false, 'A': false, 'S': false, 'D': false, 'SPACE': false}
 		self.net_input = {'W': false, 'A': false, 'S': false, 'D': false, 'SPACE': false}
+		encoded_local_input = 0
 
 
 class Frame_State:
@@ -60,16 +62,16 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 				match result[0]: #switch statement for header byte
 					0: #input received
 						#print("INPUT RECEIVED")
-						if result.size() == 7: #check for complete packet (no bytes lost)
+						if result.size() == 3: #check for complete packet (no bytes lost)
 							input_array_mutex.lock()
 							if input_arrival_array[result[1]] == false:# && frame_num%12:#if input arrival is false and input is within future window
 								print("GOOD INPUT FOR FRAME: ", result[1], ", frame_num is: ", frame_num)
 								input_array[result[1]].net_input = {
-										'W': result[2],
-										'A': result[3],
-										'S': result[4],
-										'D': result[5],
-										'SPACE': result[6]}
+										'W': bool(result[2] & 1),
+										'A': bool(result[2] & 2),
+										'S': bool(result[2] & 4),
+										'D': bool(result[2] & 8),
+										'SPACE': bool(result[2] & 16)}
 								input_arrival_array[result[1]] = true
 								input_received_mutex.lock()
 								input_received = true
@@ -84,17 +86,19 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 							while (frame != result[2]): #send inputs for requested frame and newer past frames
 								if frame == frame_num: break #do not send inputs for future frames
 								print("requests for frame ", frame, " sent.")
-								UDPPeer.put_packet(PoolByteArray([0, frame,
-										input_array[frame].local_input['W'], 
-										input_array[frame].local_input['A'],
-										input_array[frame].local_input['S'],
-										input_array[frame].local_input['D'],
-										input_array[frame].local_input['SPACE']]))
+								UDPPeer.put_packet(PoolByteArray([0, frame, input_array[frame].encoded_local_input]))
+#										input_array[frame].local_input['W'], 
+#										input_array[frame].local_input['A'],
+#										input_array[frame].local_input['S'],
+#										input_array[frame].local_input['D'],
+#										input_array[frame].local_input['SPACE']]))
 								#print("FULFILLING REQUEST FOR FRAME: ", frame)
 								frame = (frame + 1)%256
 
 					2: #game start
 						input_received = true
+					3: #game end
+						pass
 
 
 func _ready():
@@ -152,7 +156,7 @@ func _physics_process(delta):
 
 
 func handle_input(): #get input, run rollback if necessary, implement inputs
-	var pre_game_state = game_state.duplicate(true) #deep duplicate game_state of previous frame as pre_game_state
+	var pre_game_state = get_game_state()
 #	print("handle_input start pre_game_state: ", pre_game_state)
 	var actual_input = true
 	var start_rollback = false
@@ -173,7 +177,7 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 	#print("current_frame_arrival_array.push_front (oldest first)")
 	
 	var local_input = {'W': false, 'A': false, 'S': false, 'D': false, 'SPACE': false}
-	
+	var encoded_local_input = 0
 #	#print("CHILDREN: " )
 #	for child in get_children():
 #		#print(child.name)
@@ -184,29 +188,36 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 	#record local inputs
 	if Input.is_key_pressed(KEY_W):
 		local_input['W'] = true
+		encoded_local_input += 1
 #		#print("local_input['W']" + str(local_input['W']))
 	if Input.is_key_pressed(KEY_A):
 		local_input['A'] = true
+		encoded_local_input += 2
 #		#print("local_input['A']" + str(local_input['A']))
 	if Input.is_key_pressed(KEY_S):
 		local_input['S'] = true
+		encoded_local_input +=4
 #		#print("local_input['S']" + str(local_input['S']))
 	if Input.is_key_pressed(KEY_D):
 		local_input['D'] = true
+		encoded_local_input += 8
 #		#print("local_input['D']" + str(local_input['D']))
 	if Input.is_key_pressed(KEY_SPACE):
 		local_input['SPACE'] = true
+		encoded_local_input += 16
 #		#print("local_input['SPACE']" + str(local_input['SPACE']))
 	input_array[frame_num].local_input = local_input
+	input_array[frame_num].encoded_local_input = encoded_local_input
 	
-#	if (false):#for testing rollback and requests
-	for i in dup_send_range + 1: #send inputs for current frame as well as duplicates of past frame inputs
-		UDPPeer.put_packet(PoolByteArray([0, frame_num - i,
-				input_array[frame_num - i].local_input['W'], 
-				input_array[frame_num - i].local_input['A'],
-				input_array[frame_num - i].local_input['S'],
-				input_array[frame_num - i].local_input['D'],
-				input_array[frame_num - i].local_input['SPACE']]))
+	if (false):#for testing rollback and requests
+		for i in dup_send_range + 1: #send inputs for current frame as well as duplicates of past frame inputs
+			UDPPeer.put_packet(PoolByteArray([0, frame_num - i,
+					input_array[frame_num - i].encoded_local_input]))
+#				input_array[frame_num - i].local_input['W'], 
+#				input_array[frame_num - i].local_input['A'],
+#				input_array[frame_num - i].local_input['S'],
+#				input_array[frame_num - i].local_input['D'],
+#				input_array[frame_num - i].local_input['SPACE']]))
 	
 	#get current input arrival values for current frame & old frames eligible for rollback
 	for i in range(0, rollback + 1): 
@@ -299,7 +310,6 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 #	print("End of Frame: " + str(frame_num) + "\t\tgame_state: " + str(get_game_state()))
 #	print("End of Frame: " + str(state_queue[rollback - 1].frame) + "\t\tlast state_queue game_state: " + str(state_queue[rollback - 1].game_state) + "\n\n")
 	
-	get_game_state() #store game_state after execution to initialize pre_game_state for next frame
 	prev_frame_arrival_array = current_frame_arrival_array #store current input arrival array for comaparisons in next frame
 	input_arrival_array[frame_num - rollback*3] = false #reset input arrival boolean for discarded old Frame_State's frame
 	frame_num = (frame_num + 1)%256 #increment frame_num
@@ -307,8 +317,7 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 
 func frame_start_all():
 	for child in get_children():
-		if child.name != "timer":
-			child.frame_start()
+		child.frame_start()
 
 
 func reset_state_all(game_state):
@@ -332,4 +341,3 @@ func get_game_state():
 		state[child.name] = child.get_state()
 	game_state = state
 	return game_state.duplicate(true) #deep duplicate to copy all nested dictionaries by value instead of by reference
-	
