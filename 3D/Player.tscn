@@ -18,3 +18,8 @@ material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 shape = SubResource( 3 )
+
+[node name="Area" type="Area" parent="."]
+
+[node name="AreaShape" type="CollisionShape" parent="Area"]
+shape = SubResource( 3 )

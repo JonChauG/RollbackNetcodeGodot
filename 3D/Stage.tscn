@@ -1,16 +1,16 @@
 [gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://InputControl.gd" type="Script" id=1]
-[ext_resource path="res://Player.tscn" type="PackedScene" id=2]
-[ext_resource path="res://LocalPlayer.gd" type="Script" id=3]
-[ext_resource path="res://NetPlayer.gd" type="Script" id=4]
-[ext_resource path="res://Floor.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Wall.tscn" type="PackedScene" id=6]
+[ext_resource path="res://3D/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://3D/LocalPlayer3D.gd" type="Script" id=3]
+[ext_resource path="res://3D/NetPlayer3D.gd" type="Script" id=4]
+[ext_resource path="res://3D/Floor.tscn" type="PackedScene" id=5]
+[ext_resource path="res://3D/Wall.tscn" type="PackedScene" id=6]
 
 [node name="Spatial" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 10, 20 )
+transform = Transform( 1, 0, 0, 0, -4.37114e-008, 1, 0, -1, -4.37114e-008, 0, 20, 0 )
 
 [node name="InputControl" type="Node" parent="."]
 script = ExtResource( 1 )
@@ -19,7 +19,6 @@ script = ExtResource( 1 )
 transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, 0, 3, 7 )
 collision_mask = 32769
 script = ExtResource( 3 )
-mute = true
 
 [node name="NetPlayer" parent="InputControl" instance=ExtResource( 2 )]
 transform = Transform( 0.609503, -0.792783, 3.46537e-008, 0, -4.37114e-008, -1, 0.792783, 0.609503, -2.66422e-008, 0, 3, -7 )
@@ -28,10 +27,13 @@ script = ExtResource( 4 )
 [node name="Floor" parent="." instance=ExtResource( 5 )]
 
 [node name="Wall" parent="." instance=ExtResource( 6 )]
-transform = Transform( 1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, -5, 1.5, 4 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 2, 10, 1.5, 0 )
 
 [node name="Wall2" parent="." instance=ExtResource( 6 )]
-transform = Transform( -0.0257203, 0, 0.999669, 0, 1, 0, -0.999669, 0, -0.0257203, 0, 3, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 2, -10, 1.5, 0 )
 
 [node name="Wall3" parent="." instance=ExtResource( 6 )]
-transform = Transform( 0.999999, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 5, 1.5, -4 )
+transform = Transform( -4.37114e-008, 0, 2, 0, 1, 0, -1, 0, -8.74228e-008, 0, 1.5, 10 )
+
+[node name="Wall4" parent="." instance=ExtResource( 6 )]
+transform = Transform( -4.37114e-008, 0, 2, 0, 1, 0, -1, 0, -8.74228e-008, 0, 1.5, -10 )
