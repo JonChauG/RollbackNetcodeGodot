@@ -1,7 +1,6 @@
-#No rollback with collision simulation implemented in 3D!
 extends KinematicBody
 
-var counter = -1
+var counter = -1 #test value for checking if rollback and saving states is working properly
 var updateX
 var updateY
 var updateZ

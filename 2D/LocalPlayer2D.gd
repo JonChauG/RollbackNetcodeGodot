@@ -1,11 +1,9 @@
 extends KinematicBody2D
 
-var counter = -1
+var counter = -1  #test value for checking if rollback and saving states is working properly
 var updateX = null
 var updateY = null
 var updateCounter = null
-var updateShape = null
-var rectExtents = null
 
 func _ready():
 	updateX = position.x
