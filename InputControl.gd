@@ -84,7 +84,7 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 							var frame = result[1]
 							while (frame != result[2]): #send inputs for requested frame and newer past frames
 								if frame == frame_num: break #do not send inputs for future frames
-								print("requests for frame ", frame, " sent.")
+#								print("requests for frame ", frame, " sent.")
 								UDPPeer.put_packet(PoolByteArray([0, frame, input_array[frame].encoded_local_input]))
 								#print("FULFILLING REQUEST FOR FRAME: ", frame)
 								frame = (frame + 1)%256
@@ -115,7 +115,7 @@ func _ready():
 	
 	input_received = false #network thread will set to true when a networked player is found.
 	
-	#set up networking thread
+	#set up networking thread, definition of sending/receiving addresses and ports
 	UDPPeer.listen(240, "*")
 	UDPPeer.set_dest_address("::1", 240) #::1 is localhost
 	input_thread = Thread.new()

@@ -17,7 +17,11 @@ _global_script_class_icons={
 
 config/name="Rollback_Netcode"
 run/main_scene="res://2D/Stage2D.tscn"
-config/icon="res://icon.png"
+
+[layer_names]
+
+2d_physics/layer_1="Player"
+2d_physics/layer_2="Wall"
 
 [rendering]
 
