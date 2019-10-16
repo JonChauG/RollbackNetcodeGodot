@@ -64,7 +64,7 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 						if result.size() == 3: #check for complete packet (no bytes lost)
 							input_array_mutex.lock()
 							if input_arrival_array[result[1]] == false: #if input arrival is false
-#								print("GOOD INPUT FOR FRAME: ", result[1], ", frame_num is: ", frame_num)
+#								print("GOOD INPUT FOR FRAME: ", result[1], ", frame_num is: ", frame_num, ", inputs is: ", result[2])
 								input_array[result[1]].net_input = {
 										'W': bool(result[2] & 1),
 										'A': bool(result[2] & 2),
@@ -83,7 +83,7 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 #							print("RECEIVED REQUEST FOR FRAMES ", result[1], " TO ", result[2])
 							var frame = result[1]
 							while (frame != result[2]): #send inputs for requested frame and newer past frames
-								if frame == frame_num: break #do not send inputs for future frames
+								if frame == frame_num + input_delay: break #do not send inputs for future frames
 #								print("requests for frame ", frame, " sent.")
 								UDPPeer.put_packet(PoolByteArray([0, frame, input_array[frame].encoded_local_input]))
 								#print("FULFILLING REQUEST FOR FRAME: ", frame)
@@ -108,16 +108,17 @@ func _ready():
 	#initialize arrived input array
 	for i in range (0, 256):
 		input_arrival_array.append(false)
-	
 	for i in range (1, rollback + 1):
 		prev_frame_arrival_array.append(true)
 		input_arrival_array[-i] = true # for initialization, pretend all "previous" inputs arrived
-	
+	for i in range (0, input_delay):
+		input_arrival_array[i] = true # assume empty inputs at game start input_delay window
+		
 	input_received = false #network thread will set to true when a networked player is found.
 	
 	#set up networking thread, definition of sending/receiving addresses and ports
 	UDPPeer.listen(240, "*")
-	UDPPeer.set_dest_address("::1", 240) #::1 is localhost
+	UDPPeer.set_dest_address("10.0.0.10", 240) #::1 is localhost
 	input_thread = Thread.new()
 	input_thread.start(self, "thr_network_inputs", null, 2)
 	
@@ -178,13 +179,14 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 		local_input['SPACE'] = true
 		encoded_local_input += 16
 	
-	input_array[frame_num].local_input = local_input
-	input_array[frame_num].encoded_local_input = encoded_local_input
+	input_array[(frame_num + input_delay) % 256].local_input = local_input
+	input_array[(frame_num + input_delay) % 256].encoded_local_input = encoded_local_input
 	
-	if (false):#for testing rollback and requests
-		for i in dup_send_range + 1: #send inputs for current frame as well as duplicates of past frame inputs
-			UDPPeer.put_packet(PoolByteArray([0, frame_num - i,
-					input_array[frame_num - i].encoded_local_input]))
+#	if (false):#for testing rollback and requests
+	for i in dup_send_range + 1: #send inputs for current frame as well as duplicates of past frame inputs
+		UDPPeer.put_packet(PoolByteArray([0, (frame_num + input_delay - i) % 256,
+				input_array[(frame_num + input_delay - i) % 256].encoded_local_input]))
+#	print("SENT INPUT: input frame is: ", frame_num + input_delay, ", input is: ", input_array[(frame_num + input_delay) % 256].encoded_local_input)
 	
 	#get current input arrival values for current frame & old frames eligible for rollback
 	for i in range(0, rollback + 1): 
