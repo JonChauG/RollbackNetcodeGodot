@@ -1,9 +1,8 @@
 extends Node
 
-export var input_delay = 5 #amount of input delay in frames
-export var net_delay = 4 #amount of artificial "network" delay for effective inputs (for rollback testing)
-export var rollback = 7 #number of frame states to save in order to implement rollback (max amount of frames able to rollback)
-export var dup_send_range = 5 #frame range of duplicate past input packets to send every frame (should be less than rollback in current implementation)
+var input_delay = 5 #amount of input delay in frames
+var rollback = 7 #number of frame states to save in order to implement rollback (max amount of frames able to rollback)
+var dup_send_range = 5 #frame range of duplicate past input packets to send every frame (should be less than rollback in current implementation)
 
 var input_array = [] #array for inputs
 var state_queue = [] #queue for states at passed frames (for rollback)
@@ -118,7 +117,7 @@ func _ready():
 	
 	#set up networking thread, definition of sending/receiving addresses and ports
 	UDPPeer.listen(240, "*")
-	UDPPeer.set_dest_address("10.0.0.10", 240) #::1 is localhost
+	UDPPeer.set_dest_address("::1", 240) #::1 is localhost
 	input_thread = Thread.new()
 	input_thread.start(self, "thr_network_inputs", null, 2)
 	
