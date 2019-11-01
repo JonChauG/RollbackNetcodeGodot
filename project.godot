@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Rollback_Netcode"
-run/main_scene="res://2D/Stage2D.tscn"
+run/main_scene="res://2DWithCollisions/Stage2DCollisions.tscn"
 
 [layer_names]
 

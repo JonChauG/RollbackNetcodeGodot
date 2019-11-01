@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://InputControl.gd" type="Script" id=1]
+[ext_resource path="res://2DWithCollisions/InputControlCollisions.gd" type="Script" id=1]
 [ext_resource path="res://2DWithCollisions/Player2DCollisions.tscn" type="PackedScene" id=2]
 [ext_resource path="res://2DWithCollisions/LocalPlayer2DCollisions.gd" type="Script" id=3]
 [ext_resource path="res://2DWithCollisions/NetPlayer2DCollisions.gd" type="Script" id=4]
@@ -28,7 +28,7 @@ position = Vector2( 512, 570 )
 scale = Vector2( 50, 1 )
 
 [node name="StaticBody2D3" parent="." instance=ExtResource( 5 )]
-position = Vector2( 985, 300 )
+position = Vector2( 984, 300 )
 scale = Vector2( 4, 10 )
 
 [node name="StaticBody2D4" parent="." instance=ExtResource( 5 )]

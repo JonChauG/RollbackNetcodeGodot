@@ -51,6 +51,7 @@ func input_update(input):
 func input_execute():
 	#execute calculated state of object for current frame
 	set_position(Vector2(updateX, updateY))
+	counter = updateCounter
 
 
 func get_state():
