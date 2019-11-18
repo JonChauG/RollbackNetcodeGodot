@@ -40,7 +40,7 @@ func input_update(input, game_state):
 		if sibling != name:
 			if collisionMask.intersects(game_state[sibling]['collisionMask']):
 				updateCounter += 1
-				print("LocalPlayer) Rect2 intersection! counter is: " + str(counter) + ", updateCounter is: " + str(updateCounter))
+#				print("LocalPlayer) Rect2 intersection! counter is: " + str(counter) + ", updateCounter is: " + str(updateCounter))
 	
 	if input.local_input['W']:
 		vect.y -= 7
