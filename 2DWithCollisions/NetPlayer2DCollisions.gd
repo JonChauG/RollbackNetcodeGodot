@@ -11,19 +11,19 @@ func input_update(input, game_state):
 				updateCounter += 1
 #				print("NetPlayer) Rect2 intersection! counter is: " + str(counter) + ", updateCounter is: " + str(updateCounter))
 
-	if input.net_input['W']:
+	if input.net_input[0]: #W
 		vect.y += 7
 
-	if input.net_input['A']:
+	if input.net_input[1]: #A
 		vect.x += 7
 
-	if input.net_input['S']:
+	if input.net_input[2]: #S
 		vect.y -= 7
 
-	if input.net_input['D']:
+	if input.net_input[3]: #D
 		vect.x -= 7
 
-	if input.local_input['SPACE']:
+	if input.local_input[4]: #SPACE
 		updateCounter = updateCounter/2
 
 	#move_and_collide for "solid" stationary objects

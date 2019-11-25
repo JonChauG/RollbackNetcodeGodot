@@ -34,19 +34,19 @@ func frame_start():
 
 func input_update(input):
 	#calculate state of object for the current frame
-	if input.local_input['W']:
+	if input.local_input[0]: #W
 		updateZ -= 0.5
 		
-	if input.local_input['A']:
+	if input.local_input[1]: #A
 		updateX -= 0.5
 		
-	if input.local_input['S']:
+	if input.local_input[2]: #S
 		updateZ += 0.5
 		
-	if input.local_input['D']:
+	if input.local_input[3]: #D
 		updateX += 0.5
 		
-	if !input.local_input['SPACE']:
+	if !input.local_input[4]: #SPACE
 		updateCounter += 1
 	else:
 		updateCounter = updateCounter/2

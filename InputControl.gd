@@ -30,8 +30,9 @@ class Inputs:
 	var encoded_local_input
 	
 	func _init():
-		self.local_input = {'W': false, 'A': false, 'S': false, 'D': false, 'SPACE': false}
-		self.net_input = {'W': false, 'A': false, 'S': false, 'D': false, 'SPACE': false}
+		#Indexing [0]: W, [1]: A, [2]: S, [3]: D, [4]: SPACE
+		self.local_input = [false, false, false, false, false]
+		self.net_input = [false, false, false, false, false]
 		encoded_local_input = 0
 
 
@@ -67,18 +68,18 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 							input_array_mutex.lock()
 							if input_arrival_array[result[1]] == false: #if input arrival is false
 #								print("GOOD INPUT FOR FRAME: ", result[1], ", frame_num is: ", frame_num, ", inputs is: ", result[2])
-								input_array[result[1]].net_input = {
-										'W': bool(result[2] & 1),
-										'A': bool(result[2] & 2),
-										'S': bool(result[2] & 4),
-										'D': bool(result[2] & 8),
-										'SPACE': bool(result[2] & 16)}
+								input_array[result[1]].net_input = [
+										bool(result[2] & 1),
+										bool(result[2] & 2),
+										bool(result[2] & 4),
+										bool(result[2] & 8),
+										bool(result[2] & 16)]
 								input_arrival_array[result[1]] = true
 								input_received_mutex.lock()
 								input_received = true
 								input_received_mutex.unlock()
 							input_array_mutex.unlock()
-					
+
 					1: #request for input received
 						#print("REQUEST FOR INPUT RECEIVED")
 						if result.size() == 3: #check for complete packet (no bytes lost)
@@ -95,6 +96,7 @@ func thr_network_inputs(userdata = null): #thread function to read inputs from n
 
 					2: #game start
 						input_received = true
+
 					3: #game end
 						pass #add response to game end
 
@@ -162,7 +164,7 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 	var current_input = null
 	var current_frame_arrival_array = []
 
-	var local_input = {'W': false, 'A': false, 'S': false, 'D': false, 'SPACE': false}
+	var local_input = [false, false, false, false, false]
 	var encoded_local_input = 0
 	
 	frame_start_all() #for all children, set their update vars to their current/actual values
@@ -170,19 +172,19 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 	input_array_mutex.lock()
 	#record local inputs
 	if Input.is_key_pressed(KEY_W):
-		local_input['W'] = true
+		local_input[0] = true
 		encoded_local_input += 1
 	if Input.is_key_pressed(KEY_A):
-		local_input['A'] = true
+		local_input[1] = true
 		encoded_local_input += 2
 	if Input.is_key_pressed(KEY_S):
-		local_input['S'] = true
+		local_input[2] = true
 		encoded_local_input +=4
 	if Input.is_key_pressed(KEY_D):
-		local_input['D'] = true
+		local_input[3] = true
 		encoded_local_input += 8
 	if Input.is_key_pressed(KEY_SPACE):
-		local_input['SPACE'] = true
+		local_input[4] = true
 		encoded_local_input += 16
 	
 	input_array[(frame_num + input_delay) % 256].local_input = local_input
@@ -214,7 +216,9 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 		for i in state_queue: #index 0 is oldest state
 			#if an arrived input is for a past frame
 			if (prev_frame_arrival_array[state_index] == false && current_frame_arrival_array[state_index] == true):
-				i.net_input = input_array[i.frame].net_input #set input in Frame_State from guess to true actual input
+				input_array_mutex.lock()
+				i.net_input = input_array[i.frame].net_input.duplicate() #set input in Frame_State from guess to true actual input
+				input_array_mutex.unlock()
 				i.actual_input = true #input has been set from guess to actual input
 				if start_rollback == false:
 					game_state = i.game_state #set value of game_state to old state for rollback resimulation of states/inputs
@@ -234,10 +238,10 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 	current_frame_arrival_array.push_back(current_frame_arrival) #reinsert current frame's arrival boolean (for next frame's prev_frame_arrival_array)
 	current_frame_arrival_array.pop_front() #remove oldest frame's arrival boolean (needed for rollback condition comparison, but unwanted for next frame's prev_frame_arrival_array)
 	
+	current_input = Inputs.new()
 	input_array_mutex.lock()
 	#if the input for the current frame has not been received
 	if input_arrival_array[frame_num] == false:
-		current_input = Inputs.new()
 		
 		#implement guess of empty input (can be replaced with input-guessing algorithm)
 		current_input.local_input = input_array[frame_num].local_input.duplicate()
@@ -245,12 +249,13 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 
 		#implement guess of last input used
 #		current_input.local_input = input_array[frame_num].local_input.duplicate()
+#		current_input.net_input = input_array[frame_num - 1].net_input.duplicate()
 #		input_array[frame_num].net_input = input_array[frame_num - 1].net_input.duplicate()
-#		current_input.net_input = input_array[frame_num].net_input
 		
 		actual_input = false
 	else: #else (if the input for the current frame has been received), proceed with true, actual input
-		current_input = input_array[frame_num]
+		current_input.local_input = input_array[frame_num].local_input.duplicate()
+		current_input.net_input = input_array[frame_num].net_input.duplicate()
 	
 	input_arrival_array[frame_num - (rollback + 120)] = false #reset input arrival boolean for old frame
 	input_array_mutex.unlock()
@@ -266,7 +271,7 @@ func handle_input(): #get input, run rollback if necessary, implement inputs
 	execute_all() #implement all applied updates/inputs to all child objects
 	
 	#store current frame state into queue
-	state_queue.append(Frame_State.new(input_array[frame_num].local_input, current_input.net_input, frame_num, pre_game_state, actual_input))
+	state_queue.append(Frame_State.new(current_input.local_input, current_input.net_input, frame_num, pre_game_state, actual_input))
 	
 	#remove oldest state from queue if queue has exceeded size limit
 	if len(state_queue) > rollback:

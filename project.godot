@@ -18,6 +18,10 @@ _global_script_class_icons={
 config/name="Rollback_Netcode"
 run/main_scene="res://2DWithCollisions/Stage2DCollisions.tscn"
 
+[debug]
+
+gdscript/warnings/unsafe_cast=true
+
 [layer_names]
 
 2d_physics/layer_1="Player"
