@@ -1,3 +1,4 @@
+#By Jon Chau
 extends Node
 
 var input_delay = 5 #amount of input delay in frames

@@ -1,3 +1,4 @@
+#By Jon Chau
 extends "res://InputControl.gd"
 
 func handle_input(): #get input, run rollback if necessary, implement inputs

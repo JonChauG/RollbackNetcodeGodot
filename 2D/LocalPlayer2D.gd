@@ -1,3 +1,4 @@
+#By Jon Chau
 extends KinematicBody2D
 
 var counter = -1  #test value for checking if rollback and saving states is working properly

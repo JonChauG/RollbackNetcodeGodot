@@ -1,3 +1,4 @@
+#By Jon Chau
 extends "res://3D/LocalPlayer3D.gd"
 
 func input_update(input):

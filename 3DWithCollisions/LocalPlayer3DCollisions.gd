@@ -1,3 +1,5 @@
+#By Jon Chau
+#Note: imperfect example: desync may occur, possibly due to differing collision checks for either player
 extends KinematicBody
 
 var counter = -1 #test value for checking if rollback and saving states is working properly

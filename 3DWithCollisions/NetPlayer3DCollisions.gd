@@ -1,3 +1,5 @@
+#By Jon Chau
+#Note: imperfect example: desync may occur, possibly due to differing collision checks for either player
 extends "res://3DWithCollisions/LocalPlayer3DCollisions.gd"
 
 func input_update(input, game_state):

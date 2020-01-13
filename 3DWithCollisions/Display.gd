@@ -13,8 +13,6 @@ func _ready():
 	netLabel = get_node("Display/NetLabel")
 	camera = get_node("Camera")
 
-	#var offset = Vector2(label.get_size().width/2, 0)
-
 # warning-ignore:unused_argument
 func _process(delta):
 	localLabel.text = str(localPlayer.counter)

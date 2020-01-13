@@ -1,3 +1,5 @@
+#By Jon Chau
+#Note: imperfect example: desync may occur, possibly due to differing collision checks for either player
 extends "res://InputControl.gd"
 
 func handle_input(): #get input, run rollback if necessary, implement inputs

@@ -1,3 +1,4 @@
+#By Jon Chau
 extends "res://2DWithCollisions/LocalPlayer2DCollisions.gd"
 
 func input_update(input, game_state):
