@@ -1,9 +1,12 @@
 #By Jon Chau
 extends Node
 
-var input_delay = 5 #amount of input delay in frames
-var rollback = 7 #number of frame states to save in order to implement rollback (max amount of frames able to rollback)
-var dup_send_range = 5 #frame range of duplicate past input packets to send every frame (should be less than rollback in current implementation)
+#amount of input delay in frames
+var input_delay = 5 
+#number of frame states to save in order to implement rollback (max amount of frames able to rollback)
+var rollback = 7 
+#frame range of duplicate past input packets to send every frame (should be less than rollback in current implementation)
+var dup_send_range = 5
 
 var input_array = [] #array for inputs
 var state_queue = [] #queue for states at passed frames (for rollback)
@@ -13,7 +16,7 @@ var prev_frame_arrival_array = [] #boolean array to compare input arrivals betwe
 var input_array_mutex = Mutex.new()
 var input_local_saved_array_mutex = Mutex.new()
 
-var frame_num = 0 #ranges between 0-255 per circular input array cycle (cycle is every 256 frames
+var frame_num = 0 #ranges between 0-255 per circular input array cycle (cycle is every 256 frames)
 
 var game_state = {} #holds dictionaries that track children states every frame
 
@@ -26,22 +29,18 @@ var UDPPeer = PacketPeerUDP.new()
 
 #class declarations
 class Inputs:
-	var local_input #inputs by local player for a single frame
-	var net_input #inputs by a player over network for a single frame
-	var encoded_local_input
-	
-	func _init():
-		#Indexing [0]: W, [1]: A, [2]: S, [3]: D, [4]: SPACE
-		self.local_input = [false, false, false, false, false]
-		self.net_input = [false, false, false, false, false]
-		encoded_local_input = 0
+	#Indexing [0]: W, [1]: A, [2]: S, [3]: D, [4]: SPACE
+	#inputs by local player for a single frame
+	var local_input = [false, false, false, false, false] 
+	#inputs by a player over network for a single frame
+	var net_input = [false, false, false, false, false]
+	var encoded_local_input = 0
 
 
 class Frame_State:
 	var local_input #inputs by local player for a single frame
 	var net_input #inputs by a player over network for a single frame
 	var frame #frame number according to 256 frame cycle number
-	#var true_frame #absolute frame number (Warning: if game runs for a long time, this number can exceed max int. Can be used for storing frame states for a short game for replay functionality?)
 	var game_state #dictionary holds the values need for tracking a game's state at a given frame. Keys are child names.
 	var actual_input #boolean, whether the state contains guessed input (false) or actual input (true) from networked player
 
@@ -50,15 +49,14 @@ class Frame_State:
 		self.local_input = _local_input
 		self.net_input = _net_input
 		self.frame = _frame
-		#self.true_frame = _true_frame
 		self.game_state = _game_state
 		self.actual_input = _actual_input
 
 
 func thr_network_inputs(userdata = null): #thread function to read inputs from network
 	while(true):
-		UDPPeer.wait() #wait for packets to arrive
 		var result = true
+		UDPPeer.wait() #wait for packets to arrive
 		while (result):
 			result = UDPPeer.get_packet() #receive a single packet
 			if result:
