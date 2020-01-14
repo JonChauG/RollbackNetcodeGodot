@@ -45,11 +45,11 @@ class Frame_State:
 	var actual_input #boolean, whether the state contains guessed input (false) or actual input (true) from networked player
 
 
-	func _init(_local_input, _net_input, _frame, _game_state, _actual_input):
-		self.local_input = _local_input
-		self.net_input = _net_input
+	func _init(_local_input : Array, _net_input : Array, _frame : int, _game_state : Dictionary, _actual_input : bool):
+		self.local_input = _local_input #Array of booleans
+		self.net_input = _net_input #Array of booleans
 		self.frame = _frame
-		self.game_state = _game_state
+		self.game_state = _game_state #Array of dictionaries
 		self.actual_input = _actual_input
 
 
@@ -108,7 +108,7 @@ func _ready():
 	#initialize state queue
 	for x in range (0, rollback):
 		#empty local input, empty net input, frame 0, inital game state, treat initial empty inputs as true
-		state_queue.append(Frame_State.new({}, {}, 0, get_game_state(), true))
+		state_queue.append(Frame_State.new([], [], 0, get_game_state(), true))
 	
 	#initialize arrived input array
 	for i in range (0, 256):
