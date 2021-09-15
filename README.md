@@ -1,4 +1,25 @@
 # RollbackNetcodeGodot
+
+# UPDATE:
+Repositories:
+
+https://github.com/JonChauG/GodotRollbackNetcode-Part-1
+
+https://github.com/JonChauG/GodotRollbackNetcode-Part-2
+
+https://github.com/JonChauG/GodotRollbackNetcode-Part-3-FINAL (Please use the repository here instead of this one)
+
+---
+
+Tutorial Videos:
+
+Part 1: Base Game and Saving Game States - https://www.youtube.com/watch?v=AOct7C422z8
+
+Part 2: Delay-Based Netcode - https://www.youtube.com/watch?v=X55-gfqhQ_E
+
+Part 3 (Final): Rollback Netcode - https://www.youtube.com/watch?v=sg1Q_71cjd8
+
+---
 Rollback netcode example for Godot.
 
 Demo video: https://www.youtube.com/watch?v=CrqZW6EoGII
@@ -17,6 +38,3 @@ Overall, compared to delay-based netcode, rollback netcode provides a larger tim
 
 
 \*I save states at every frame for simplicity. I believe you only really need to save states on frames when inputs are guessed, but all player inputs should be saved on every frame until unneeded.
-
----
-Currently working on cleaner code and video tutorial series (to be in a separate repository).
