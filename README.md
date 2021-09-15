@@ -1,6 +1,6 @@
-# RollbackNetcodeGodot
+# RollbackNetcodeGodot (OUTDATED)
 
-# UPDATE:
+# UPDATE: New code and tutorial series available
 Repositories:
 
 https://github.com/JonChauG/GodotRollbackNetcode-Part-1
